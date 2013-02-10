@@ -74,11 +74,6 @@ public class RibbonApplication {
     private ApplicationRole CURRENT_ROLE;
     
     /**
-     * Is application already initiadted (has configuration file);
-     */
-    private Boolean IS_INITIATED = false;
-    
-    /**
      * Log file object;
      */
     private java.io.File logFile;
@@ -197,7 +192,8 @@ public class RibbonApplication {
                 this.log(0, "Неможливо створити файл конфігурації!");
                 System.exit(2);
             } finally {
-                this.performConfig();
+                UIComponents.settingsDialog propDialog = new UIComponents.settingsDialog(null, true, ApplicationProperties);
+                propDialog.setVisible(true);
                 try {
                     this.ApplicationProperties.store(new java.io.FileWriter(mainProps), null);
                 } catch (java.io.IOException ex) {
@@ -228,25 +224,6 @@ public class RibbonApplication {
         } catch (java.io.IOException ex) {
             this.log(0, "Неможливо зберегти файл конфігурації!");
             System.exit(2);
-        }
-    }
-    
-    /**
-     * Perform basic application config;<br>
-     * WARNING! This method cause main thread wait;
-     */
-    public void performConfig() {
-        Object settingsLock = new Object();
-        synchronized (settingsLock) {
-            UIComponents.settingsDialog ConfigWindow = new UIComponents.settingsDialog(new javax.swing.JFrame(), false, this.ApplicationProperties, settingsLock);
-            ConfigWindow.setVisible(true);
-            while (ConfigWindow.isVisible()) {
-                try {
-                    settingsLock.wait();
-                } catch (InterruptedException ex) {
-                    
-                }
-            }
         }
     }
     
