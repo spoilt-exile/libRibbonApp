@@ -123,7 +123,6 @@ public class RibbonApplication {
             ex.printStackTrace();
             System.exit(7);
         }
-        //this.appWorker.start();
         Object loginLock = new Object();
         synchronized (loginLock) {
             UIComponents.loginDialog LoginWindow = new UIComponents.loginDialog(new javax.swing.JFrame(), false, loginLock, this);

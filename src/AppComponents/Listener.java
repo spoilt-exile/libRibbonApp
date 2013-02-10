@@ -25,6 +25,10 @@ package AppComponents;
  */
 public abstract class Listener {
     
+    /**
+     * Default constructor;
+     * @param givenComm command to listen;
+     */
     public Listener(String givenComm) {
         COMM_NAME = givenComm;
     }

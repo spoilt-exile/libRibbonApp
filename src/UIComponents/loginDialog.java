@@ -25,8 +25,14 @@ package UIComponents;
  */
 public class loginDialog extends javax.swing.JDialog {
     
+    /**
+     * Parent thread lock;
+     */
     private Object LOCK;
     
+    /**
+     * Link to application object
+     */
     private AppComponents.RibbonApplication currApp;
 
     /**

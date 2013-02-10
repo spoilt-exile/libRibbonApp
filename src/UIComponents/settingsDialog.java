@@ -25,8 +25,14 @@ package UIComponents;
  */
 public class settingsDialog extends javax.swing.JDialog {
     
+    /**
+     * Properties to modification by this frame;
+     */
     private java.util.Properties processedProps;
     
+    /**
+     * Parent thread lock;
+     */
     private Object LOCK = null;
     
     /**
