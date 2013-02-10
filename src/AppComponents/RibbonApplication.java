@@ -279,6 +279,14 @@ public class RibbonApplication {
     }
     
     /**
+     * Report error recieved from server;
+     * @param message raw server message;
+     */
+    public void reportError(String message) {
+        this.log(1, "Помилка системи:\n" + Generic.CsvFormat.parseDoubleStruct(message)[1]);
+    }
+    
+    /**
      * Get hash sum of given string.
      * @param givenStr given string;
      * @return md5 hash sum representation;
