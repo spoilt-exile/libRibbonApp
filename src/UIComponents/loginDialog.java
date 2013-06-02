@@ -99,6 +99,7 @@ public class loginDialog extends javax.swing.JDialog {
         loginButton = new javax.swing.JButton();
         errorDisplay = new javax.swing.JLabel();
         settingsBut = new javax.swing.JButton();
+        sessionSwitch = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Увійти до \"Стрічки\"");
@@ -134,26 +135,34 @@ public class loginDialog extends javax.swing.JDialog {
             }
         });
 
+        sessionSwitch.setText("Запомнить сессию");
+        sessionSwitch.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sessionSwitchStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(passField, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(loginField, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(errorDisplay, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(passField)
+                    .addComponent(loginField)
+                    .addComponent(errorDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(settingsBut)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(loginButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(cancelButton))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(sessionSwitch))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -169,13 +178,15 @@ public class loginDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(passField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(sessionSwitch)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(errorDisplay)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
                     .addComponent(loginButton)
                     .addComponent(settingsBut))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -188,7 +199,6 @@ public class loginDialog extends javax.swing.JDialog {
         this.currApp.SERVER_IP = this.currApp.ApplicationProperties.getProperty("server_address");
         this.currApp.SERVER_PORT = Integer.parseInt(this.currApp.ApplicationProperties.getProperty("server_port"));
         this.currApp.updateProperties();
-        //this.currApp.appWorker = new AppComponents.NetWorker(currApp);
         try {
             this.currApp.appWorker = currApp.appWorkerClass.getConstructor(AppComponents.RibbonApplication.class).newInstance(currApp);
         } catch (Exception ex) {
@@ -196,7 +206,6 @@ public class loginDialog extends javax.swing.JDialog {
             ex.printStackTrace();
             System.exit(7);
         }
-        //this.currApp.appWorker.start();
         this.initConnection();
     }//GEN-LAST:event_settingsButActionPerformed
 
@@ -207,6 +216,10 @@ public class loginDialog extends javax.swing.JDialog {
             String respond = this.currApp.appWorker.sendCommandWithReturn("RIBBON_NCTL_LOGIN:{" + this.loginField.getText()
                     + "}," + hashed);
             if (respond.startsWith("OK:")) {
+                if (this.sessionSwitch.isEnabled()) {
+                    this.currApp.ApplicationProperties.setProperty("session_id", Generic.CsvFormat.parseDoubleStruct(respond)[1]);
+                    this.currApp.updateProperties();
+                }
                 this.dispose();
             } else {
                 this.currApp.log(2, respond);
@@ -219,6 +232,15 @@ public class loginDialog extends javax.swing.JDialog {
             LOCK.notifyAll();
         }
     }//GEN-LAST:event_loginButtonActionPerformed
+
+    private void sessionSwitchStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sessionSwitchStateChanged
+        if (this.sessionSwitch.isEnabled()) {
+            this.currApp.ApplicationProperties.setProperty("remember_session", "1");
+        } else {
+            this.currApp.ApplicationProperties.setProperty("remember_session", "0");
+        }
+        this.currApp.updateProperties();
+    }//GEN-LAST:event_sessionSwitchStateChanged
 
     /**
      * @param args the command line arguments
@@ -276,6 +298,7 @@ public class loginDialog extends javax.swing.JDialog {
     private javax.swing.JButton loginButton;
     private javax.swing.JTextField loginField;
     private javax.swing.JPasswordField passField;
+    private javax.swing.JCheckBox sessionSwitch;
     private javax.swing.JButton settingsBut;
     // End of variables declaration//GEN-END:variables
 }

@@ -126,6 +126,13 @@ public class RibbonApplication {
         Object loginLock = new Object();
         synchronized (loginLock) {
             UIComponents.loginDialog LoginWindow = new UIComponents.loginDialog(new javax.swing.JFrame(), false, loginLock, this);
+            if (this.ApplicationProperties.getProperty("remember_session").equals("1") && this.ApplicationProperties.getProperty("session_id") != null) {
+                String respond = this.appWorker.sendCommandWithReturn("RIBBON_NCTL_RESUME:" + this.ApplicationProperties.getProperty("session_id"));
+                if (respond.equals("OK:")) {
+                    LoginWindow = null;
+                    return;
+                }
+            }
             LoginWindow.setVisible(true);
             while (LoginWindow.isVisible()) {
                 try {
