@@ -94,6 +94,11 @@ public class RibbonApplication {
     public Class<AppComponents.NetWorker> appWorkerClass;
     
     /**
+     * Application initiation flag.
+     */
+    public Boolean isInited = false;
+    
+    /**
      * Main constructor
      * @param appName name of application wich will be used;
      * @param localName localizated name of application;
@@ -124,7 +129,7 @@ public class RibbonApplication {
             System.exit(7);
         }
         Object loginLock = new Object();
-        synchronized (loginLock) {
+        /**synchronized (loginLock) {
             UIComponents.loginDialog LoginWindow = new UIComponents.loginDialog(new javax.swing.JFrame(), false, loginLock, this);
             if (this.ApplicationProperties.getProperty("remember_session").equals("1") && this.ApplicationProperties.getProperty("session_id") != null) {
                 String respond = this.appWorker.sendCommandWithReturn("RIBBON_NCTL_RESUME:" + this.ApplicationProperties.getProperty("session_id"));
@@ -141,7 +146,17 @@ public class RibbonApplication {
                     
                 }
             }
+        }**/
+        UIComponents.LoginWindow loginFrame = new UIComponents.LoginWindow(this);
+        if (this.ApplicationProperties.getProperty("remember_session").equals("1") && this.ApplicationProperties.getProperty("session_id") != null) {
+            String respond = this.appWorker.sendCommandWithReturn("RIBBON_NCTL_RESUME:" + this.ApplicationProperties.getProperty("session_id"));
+            if (respond.equals("OK:")) {
+                loginFrame = null;
+                return;
+            }
         }
+        loginFrame.setVisible(true);
+        loginFrame.waitForClose();
     }
     
     /**
