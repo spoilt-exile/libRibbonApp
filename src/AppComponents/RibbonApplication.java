@@ -46,6 +46,11 @@ public class RibbonApplication {
     public Integer SERVER_PORT;
     
     /**
+     * Current login;
+     */
+    public String CURR_LOGIN;
+    
+    /**
      * Name of application
      */
     public String APP_NAME;
@@ -128,30 +133,12 @@ public class RibbonApplication {
             ex.printStackTrace();
             System.exit(7);
         }
-        Object loginLock = new Object();
-        /**synchronized (loginLock) {
-            UIComponents.loginDialog LoginWindow = new UIComponents.loginDialog(new javax.swing.JFrame(), false, loginLock, this);
-            if (this.ApplicationProperties.getProperty("remember_session").equals("1") && this.ApplicationProperties.getProperty("session_id") != null) {
-                String respond = this.appWorker.sendCommandWithReturn("RIBBON_NCTL_RESUME:" + this.ApplicationProperties.getProperty("session_id"));
-                if (respond.equals("OK:")) {
-                    LoginWindow = null;
-                    return;
-                }
-            }
-            LoginWindow.setVisible(true);
-            while (LoginWindow.isVisible()) {
-                try {
-                    loginLock.wait();
-                } catch (InterruptedException ex) {
-                    
-                }
-            }
-        }**/
         UIComponents.LoginWindow loginFrame = new UIComponents.LoginWindow(this);
         if (this.ApplicationProperties.getProperty("remember_session").equals("1") && this.ApplicationProperties.getProperty("session_id") != null) {
             String respond = this.appWorker.sendCommandWithReturn("RIBBON_NCTL_RESUME:" + this.ApplicationProperties.getProperty("session_id"));
             if (respond.equals("OK:")) {
                 loginFrame = null;
+                this.CURR_LOGIN = this.ApplicationProperties.getProperty("session_login");
                 return;
             }
         }

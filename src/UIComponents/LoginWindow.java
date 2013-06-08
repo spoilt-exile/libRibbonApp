@@ -49,8 +49,11 @@ public class LoginWindow extends javax.swing.JFrame {
     public LoginWindow(AppComponents.RibbonApplication givenApp) {
         this();
         currApp = givenApp;
-        if (currApp.isInited) {
+        if (currApp.appWorker.isAlive()) {
             this.settingsBut.setEnabled(false);
+            this.loginButton.setEnabled(true);
+            this.loginField.setEditable(true);
+            this.passField.setEditable(true);
         } else {
             this.cancelButton.setText("Вихід");
             initConnection();
@@ -246,8 +249,11 @@ public class LoginWindow extends javax.swing.JFrame {
             String respond = this.currApp.appWorker.sendCommandWithReturn("RIBBON_NCTL_LOGIN:{" + this.loginField.getText()
                     + "}," + hashed);
             if (respond.startsWith("OK:")) {
+                this.currApp.CURR_LOGIN = this.loginField.getText();
+                this.currApp.isInited = true;
                 if (this.sessionSwitch.isEnabled()) {
                     this.currApp.ApplicationProperties.setProperty("session_id", Generic.CsvFormat.parseDoubleStruct(respond)[1]);
+                    this.currApp.ApplicationProperties.setProperty("session_login", this.currApp.CURR_LOGIN);
                     this.currApp.updateProperties();
                 }
                 synchronized (LOCK) {
