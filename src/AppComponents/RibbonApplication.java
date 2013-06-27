@@ -134,7 +134,7 @@ public class RibbonApplication {
             System.exit(7);
         }
         UIComponents.LoginWindow loginFrame = new UIComponents.LoginWindow(this);
-        if ("1".equals(this.ApplicationProperties.getProperty("remember_session")) && this.ApplicationProperties.getProperty("session_id") != null) {
+        if ("1".equals(this.ApplicationProperties.getProperty("remember_session")) && this.ApplicationProperties.getProperty("session_id") != null && this.appWorker.isAlive) {
             String respond = this.appWorker.sendCommandWithReturn("RIBBON_NCTL_RESUME:" + this.ApplicationProperties.getProperty("session_id"));
             if (respond.equals("OK:")) {
                 loginFrame = null;

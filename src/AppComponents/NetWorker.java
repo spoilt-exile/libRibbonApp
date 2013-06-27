@@ -43,7 +43,7 @@ public class NetWorker extends Thread{
     /**
      * Display is NetWorker connection is alive.
      */
-    private Boolean isAlive;
+    public Boolean isAlive = false;
     
     /**
      * Array of protocol listeners.
@@ -84,15 +84,14 @@ public class NetWorker extends Thread{
     public NetWorker(AppComponents.RibbonApplication givenApp) {
         this.NetListeners = getProtocol();
         currentApplication = givenApp;
-        isAlive = true;
         try {
             clientSocket = new java.net.Socket(currentApplication.SERVER_IP, currentApplication.SERVER_PORT);
             inStream = new java.io.BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
             outStream = new java.io.PrintWriter(clientSocket.getOutputStream(), true);
+            currentApplication.log(3, "мережевий доступ встановлено (" + currentApplication.SERVER_IP + ":" + currentApplication.SERVER_PORT.toString() + ")");
+            isAlive = true;
         } catch (java.io.IOException ex) {
             currentApplication.log(1, "Неможливо з'єднатися з сервером!");
-        } finally {
-            currentApplication.log(3, "мережевий доступ встановлено (" + currentApplication.SERVER_IP + ":" + currentApplication.SERVER_PORT.toString() + ")");
         }
     }
     
