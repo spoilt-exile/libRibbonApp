@@ -149,7 +149,12 @@ public class NetWorker extends Thread{
         Boolean executed = false;
         for (Listener currListener : NetListeners) {
             if (parsedCommandStruct[0].equals(currListener.COMM_NAME)) {
-                currListener.exec(parsedCommandStruct[1]);
+                try {
+                    currListener.exec(parsedCommandStruct[1]);
+                } catch (Exception ex) {
+                    this.currentApplication.log(1, "ошибка при выполнении команды: " + inputCommand);
+                    ex.printStackTrace();
+                }
                 executed = true;
             }
         }
