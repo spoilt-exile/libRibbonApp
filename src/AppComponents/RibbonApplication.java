@@ -323,4 +323,46 @@ public class RibbonApplication {
         }
         return hexString.toString();
     }
+    
+    /**
+     * Get existed properties or create new one with given stream;
+     * @param fileName file postfix to read;
+     * @param newFileStream stream of template properties in app jar;
+     * @return loaded properties;
+     */
+    public java.util.Properties getProperties(String fileName, java.io.InputStream newFileStream) {
+        java.util.Properties gettedProps = new java.util.Properties();
+        java.io.File propsFile = new java.io.File(this.CONFIG_PATH + "/" + this.renderAppFilename(fileName));
+        if (propsFile.exists()) {
+            try {
+                gettedProps.load(new java.io.FileInputStream(propsFile));
+            } catch (java.io.IOException ex) {
+                this.log(1, "неможливо прочитати файл налаштуваннь (" + propsFile.getAbsolutePath() + ")");
+            }
+        } else {
+           try {
+               this.log(2, "створюю новий файл налаштуваннь (" + propsFile.getAbsolutePath() + ")");
+               gettedProps.load(newFileStream);
+               gettedProps.store(new java.io.FileOutputStream(propsFile), null);
+            } catch (java.io.IOException ex) {
+                this.log(1, "неможливо створити файл налаштуваннь (" + propsFile.getAbsolutePath() + ")");
+            }
+        }
+        return gettedProps;
+    }
+    
+    /**
+     * Store properties.
+     * @param fileName file name postfix to save;
+     * @param givenProps properties to save;
+     */
+    public void storeProperties(String fileName, java.util.Properties givenProps) {
+        java.io.File storeFile = new java.io.File(this.CONFIG_PATH + "/" + this.renderAppFilename(fileName));
+        try {
+            this.log(2, "збереження файлу налаштуваннь (" + storeFile.getAbsolutePath() + ")");
+            givenProps.store(new java.io.FileOutputStream(storeFile), null);
+        } catch (java.io.IOException ex) {
+            this.log(1, "неможливо створити файл налаштуваннь (" + storeFile.getAbsolutePath() + ")");
+        }
+    }
 }
