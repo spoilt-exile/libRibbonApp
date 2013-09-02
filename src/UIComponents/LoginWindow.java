@@ -34,6 +34,16 @@ public class LoginWindow extends javax.swing.JFrame {
      * Link to application object
      */
     private AppComponents.RibbonApplication currApp;
+    
+    /**
+     * Post connection handler.
+     */
+    private Runnable postRun;
+    
+    /**
+     * Initialization running flag.
+     */
+    private Boolean initRun = true;
 
     /**
      * Default constructor.
@@ -45,9 +55,11 @@ public class LoginWindow extends javax.swing.JFrame {
     /**
      * Parametrick constructor.
      * @param givenApp application object;
+     * @param postConnectRun action which will be executed after successful login;
      */
-    public LoginWindow(AppComponents.RibbonApplication givenApp) {
+    public LoginWindow(AppComponents.RibbonApplication givenApp, Runnable postConnectRun) {
         this();
+        postRun = postConnectRun;
         currApp = givenApp;
         if (currApp.appWorker.isAlive()) {
             this.settingsBut.setEnabled(false);
@@ -62,6 +74,7 @@ public class LoginWindow extends javax.swing.JFrame {
             this.sessionSwitch.setEnabled(true);
         }
         this.errorDisplay.setText("");
+        this.initRun = false;
     }
     
     /**
@@ -81,6 +94,13 @@ public class LoginWindow extends javax.swing.JFrame {
         } catch (NullPointerException ex) {
             this.setError("НЕМАЄ ЗВ'ЯЗКУ!");
         }
+    }
+    
+    /**
+     * Run post action.
+     */
+    public void runPost() {
+        new Thread(postRun).start();
     }
     
     /**
@@ -259,6 +279,7 @@ public class LoginWindow extends javax.swing.JFrame {
                 synchronized (LOCK) {
                     LOCK.notifyAll();
                 }
+                runPost();
                 this.dispose();
             } else {
                 this.currApp.log(2, respond);
@@ -270,12 +291,14 @@ public class LoginWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_loginButtonActionPerformed
 
     private void sessionSwitchStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sessionSwitchStateChanged
-        if (this.sessionSwitch.isEnabled()) {
-            this.currApp.ApplicationProperties.setProperty("remember_session", "1");
-        } else {
-            this.currApp.ApplicationProperties.setProperty("remember_session", "0");
+        if (!this.initRun) {
+            if (this.sessionSwitch.isEnabled()) {
+                this.currApp.ApplicationProperties.setProperty("remember_session", "1");
+            } else {
+                this.currApp.ApplicationProperties.setProperty("remember_session", "0");
+            }
+            this.currApp.updateProperties();
         }
-        this.currApp.updateProperties();
     }//GEN-LAST:event_sessionSwitchStateChanged
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed

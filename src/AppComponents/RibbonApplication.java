@@ -124,7 +124,7 @@ public class RibbonApplication {
     /**
      * Connect to server and init network;
      */
-    public void connect(Class workerClass) {
+    public void connect(Class workerClass, Runnable postHandler) {
         this.appWorkerClass = workerClass;
         try {
             this.appWorker = appWorkerClass.getConstructor(RibbonApplication.class).newInstance(this);
@@ -133,17 +133,22 @@ public class RibbonApplication {
             ex.printStackTrace();
             System.exit(7);
         }
-        UIComponents.LoginWindow loginFrame = new UIComponents.LoginWindow(this);
+        UIComponents.LoginWindow loginFrame = new UIComponents.LoginWindow(this , postHandler);
         if ("1".equals(this.ApplicationProperties.getProperty("remember_session")) && this.ApplicationProperties.getProperty("session_id") != null && this.appWorker.isAlive) {
             String respond = this.appWorker.sendCommandWithReturn("RIBBON_NCTL_RESUME:" + this.ApplicationProperties.getProperty("session_id"));
             if (respond.equals("OK:")) {
+                loginFrame.runPost();
                 loginFrame = null;
                 this.CURR_LOGIN = this.ApplicationProperties.getProperty("session_login");
+                this.isInited = true;
                 return;
             }
         }
         loginFrame.setVisible(true);
+        loginFrame.toFront();
+        loginFrame.repaint();
         loginFrame.waitForClose();
+        this.isInited = true;
     }
     
     /**
