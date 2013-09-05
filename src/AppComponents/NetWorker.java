@@ -145,21 +145,25 @@ public class NetWorker extends Thread{
      * @param inputCommand command to execute;
      */
     private void exec(String inputCommand) {
-        String[] parsedCommandStruct = Generic.CsvFormat.parseDoubleStruct(inputCommand);
-        Boolean executed = false;
-        for (Listener currListener : NetListeners) {
-            if (parsedCommandStruct[0].equals(currListener.COMM_NAME)) {
-                try {
-                    currListener.exec(parsedCommandStruct[1]);
-                } catch (Exception ex) {
-                    this.currentApplication.log(1, "ошибка при выполнении команды: " + inputCommand);
-                    ex.printStackTrace();
+        if (this.NetListeners != null) {
+            String[] parsedCommandStruct = Generic.CsvFormat.parseDoubleStruct(inputCommand);
+            Boolean executed = false;
+            for (Listener currListener : NetListeners) {
+                if (parsedCommandStruct[0].equals(currListener.COMM_NAME)) {
+                    try {
+                        currListener.exec(parsedCommandStruct[1]);
+                    } catch (Exception ex) {
+                        this.currentApplication.log(1, "ошибка при выполнении команды: " + inputCommand);
+                        ex.printStackTrace();
+                    }
+                    executed = true;
                 }
-                executed = true;
             }
-        }
-        if (!executed) {
-            currentApplication.log(2, "невідома команда: " + inputCommand);
+            if (!executed) {
+                currentApplication.log(2, "невідома команда: " + inputCommand);
+            }
+        } else {
+            this.currentApplication.log(2, "отримана команда '" + inputCommand + "' але немає слухачів.");
         }
     }
     
