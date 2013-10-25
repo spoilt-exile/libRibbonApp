@@ -139,7 +139,12 @@ public class RibbonApplication {
             if (respond.equals("OK:")) {
                 loginFrame.runPost();
                 loginFrame = null;
-                this.CURR_LOGIN = this.ApplicationProperties.getProperty("session_login");
+                String userCsv = this.appWorker.sendCommandWithReturn("RIBBON_NCTL_GET_USERNAME:");
+                if (userCsv.startsWith("RIBBON_ERROR:")) {
+                    this.reportError(userCsv);
+                } else {
+                    this.CURR_LOGIN = Generic.CsvFormat.complexParseLine(userCsv, 2, 1).get(0)[0];
+                }
                 this.isInited = true;
                 return;
             }
