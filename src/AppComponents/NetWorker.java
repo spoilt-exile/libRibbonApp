@@ -108,6 +108,10 @@ public class NetWorker extends Thread{
          while (isAlive) {
             try {
                 String inputLine = inStream.readLine();
+                if (inputLine == null) {
+                    this.isAlive = false;
+                    break;
+                }
                 switch (collectState) {
                     case 0:
                         this.exec(inputLine);
